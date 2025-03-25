@@ -4,6 +4,8 @@
 Run:ai Chatbot
 A Retrieval-Augmented Generation (RAG) chatbot designed to answer questions about Run:ai cluster setup and installation using scraped documentation and NVIDIA AI models.
 
+https://build.nvidia.com/nvidia/neva-22b
+
 
 Scrapes content from the Run:ai documentation .
 Uses a vector database (FAISS) to store and retrieve relevant information.
