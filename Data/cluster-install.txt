@@ -1,0 +1,106 @@
+Run:ai Cluster Installation Guide
+This article explains the steps required to install the Run:ai cluster on a Kubernetes cluster using Helm.
+
+Before Installation
+There are a number of matters to consider prior to installing using Helm.
+
+System and Network Requirements
+Before installing the Run:ai cluster, validate that the system requirements and network requirements are met.
+
+Once all the requirements are met, it is highly recommended to use the Run:ai cluster preinstall diagnostics tool to:
+
+Test the system requirements in addition to failure points related to Kubernetes, NVIDIA, storage, and networking.
+Analyze additional components installed and their relevance to a successful installation.
+To run the preinstall diagnostics tool, download the latest version from here .
+
+SaaS Deployment
+
+chmod +x ./preinstall-diagnostics-<platform> && \
+./preinstall-diagnostics-<platform> \
+  --domain ${COMPANY_NAME}.run.ai \
+  --cluster-domain ${CLUSTER_FQDN}
+
+Self-Hosted Deployment
+
+chmod +x ./preinstall-diagnostics-<platform> && \
+./preinstall-diagnostics-<platform> \
+  --domain ${CONTROL_PLANE_FQDN} \
+  --cluster-domain ${CLUSTER_FQDN} \
+  --image-pull-secret ${IMAGE_PULL_SECRET_NAME} \
+  --image ${PRIVATE_REGISTRY_IMAGE_URL}
+
+
+Airgap Deployment
+
+In an air-gapped deployment, the diagnostics image is saved, pushed, and pulled manually from the organization's registry.
+
+# Save the image locally
+docker save --output preinstall-diagnostics.tar gcr.io/run-ai-lab/preinstall-diagnostics:${VERSION}
+
+# Load the image to the organization's registry
+docker load --input preinstall-diagnostics.tar
+docker tag gcr.io/run-ai-lab/preinstall-diagnostics:${VERSION} ${CLIENT_IMAGE_AND_TAG}
+docker push ${CLIENT_IMAGE_AND_TAG}
+
+Run the binary with the --image parameter to modify the diagnostics image to be used:
+
+chmod +x ./preinstall-diagnostics-darwin-arm64 && \
+./preinstall-diagnostics-darwin-arm64 \
+  --domain ${CONTROL_PLANE_FQDN} \
+  --cluster-domain ${CLUSTER_FQDN} \
+  --image-pull-secret ${IMAGE_PULL_SECRET_NAME} \
+  --image ${PRIVATE_REGISTRY_IMAGE_URL}
+
+Helm
+Run:ai cluster requires Helm 3.14 or above. To install Helm, see Helm Install .
+
+Permissions
+A Kubernetes user with the cluster-admin role is required to ensure a successful installation. For more information, see Using RBAC authorization .
+
+Run:ai Namespace
+Run:ai cluster must be installed in a namespace named runai. Create the namespace by running:
+
+kubectl create ns runai
+
+TLS Certificates
+A TLS private and public key are required for HTTP access to the cluster. Create a Kubernetes Secret named runai-cluster-domain-tls-secret in the runai namespace with the cluster’s Fully Qualified Domain Name (FQDN) private and public keys by running:
+
+kubectl create secret tls runai-cluster-domain-tls-secret -n runai \
+    --cert /path/to/fullchain.pem \
+    --key /path/to/private.pem
+
+Installation
+Follow these instructions to install using Helm.
+
+Adding a New Cluster
+Follow the steps below to add a new cluster.
+
+Note: When adding a cluster for the first time, the New Cluster form automatically opens when you log in to the Run:ai platform. Other actions are prevented until the cluster is created. 
+
+In the Run:ai platform, go to Resources .
+Click +NEW CLUSTER .
+Enter a unique name for your cluster.
+Optional: Choose the Run:ai cluster version (latest, by default).
+Enter the Cluster URL. For more information, see Domain Name Requirement .
+Click Continue .
+Installing Run:ai Cluster
+Follow the installation instructions and run the commands provided on your Kubernetes cluster.
+Click DONE .
+The cluster is displayed in the table with the status Waiting to connect . Once installation is complete, the cluster status changes to Connected .
+
+Note: To customize the installation based on your environment, see Customize cluster installation . 
+
+Troubleshooting
+Installation
+If the Run:ai cluster installation failed, check the installation logs to identify the issue. Run the following script to print the installation logs:
+
+curl -fsSL https://raw.githubusercontent.com/run-ai/public/main/installation/get-installation-logs.sh
+
+Cluster Status
+If the Run:ai cluster installation completed but the cluster status did not change to Connected , check the cluster troubleshooting scenarios .
+
+
+
+
+
+
