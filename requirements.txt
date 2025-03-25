@@ -1,0 +1,7 @@
+langchain
+langchain-nvidia-ai-endpoints
+streamlit
+faiss-cpu
+requests
+beautifulsoup4
+langchain-community
